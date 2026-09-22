@@ -11,7 +11,7 @@ export default async function handler(request, response) {
             if (!room) {
                 return response.status(404).json({ status: "Not found" });
             }
-            response.status(200).json(room);
+            return response.status(200).json(room);
         } catch (error) {
             console.error(error);
             response.status(400).json({ message: "couldnt get room" });
@@ -20,7 +20,9 @@ export default async function handler(request, response) {
         try {
             const roomData = request.body;
             await Room.findByIdAndUpdate(id, roomData);
-            return response.status(200).json({ status: `Room ${id} updated` });
+            return response
+                .status(200)
+                .json({ status: `Room ${id} was updated` });
         } catch (error) {
             console.error(error);
             return response.status(400).json({ message: "couldnt update" });
@@ -28,7 +30,9 @@ export default async function handler(request, response) {
     } else if (request.method === "DELETE") {
         try {
             await Room.findByIdAndDelete(id);
-            response.status(200).json({ status: `Room ${id} was deleted` });
+            return response
+                .status(200)
+                .json({ status: `Room ${id} was deleted` });
         } catch (error) {
             console.error(error);
             return response.status(400).json({ message: "couldnt Delete" });

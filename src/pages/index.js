@@ -4,6 +4,7 @@ import Image from "next/image";
 import List from "../../components/List";
 import Link from "next/link";
 import useSWR from "swr";
+import RoomForm from "../../components/RoomForm";
 
 const fetcher = (url) => fetch(url).then((response) => response.json());
 
@@ -30,6 +31,7 @@ export default function Home() {
                     </Link>
                 );
             })}
+            <RoomForm />
             <div>hi</div>
         </>
     );

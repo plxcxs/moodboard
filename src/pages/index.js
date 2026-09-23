@@ -13,7 +13,7 @@ export default function Home() {
 
     if (error) return <div>error buhhuu</div>;
     if (isLoading) return <div>is loading beeeheee</div>;
-    console.log(rooms[0]);
+
     return (
         <>
             <Head>

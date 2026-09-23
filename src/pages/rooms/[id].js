@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import useSWR from "swr";
+import { useState } from "react";
 import Link from "next/link";
 import styled from "styled-components";
 import Image from "next/image";
@@ -21,29 +22,47 @@ export default function RoomPage() {
         fetcher,
     );
 
+    const [message, setMessage] = useState();
+
     async function handleSubmit(event) {
         event.preventDefault();
 
-        const formData = new FormData(event.target);
+        try {
+            const formData = new FormData(event.target);
 
-        const response = await fetch("/api/upload", {
-            method: "POST",
-            body: formData,
-        });
-        const data = await response.json();
-        console.log(data);
-        await fetch("/api/pictures", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ picture: data.secure_url, roomId: id }),
-        });
-        mutatePictures();
+            const response = await fetch("/api/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error("Upload Failed");
+            }
+
+            const data = await response.json();
+
+            const pictureResponse = await fetch("/api/pictures", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ picture: data.secure_url, roomId: id }),
+            });
+
+            if (!pictureResponse.ok) {
+                throw new Error("picture could not be saved");
+            }
+
+            mutatePictures();
+        } catch (error) {
+            console.error(error);
+            setMessage(error.mesage || "something went wrong");
+            setTimeout(() => setMessage(null), 3000);
+        }
     }
 
     if (error) return <div>Error while Loading</div>;
     if (isLoading) return <div>Loading</div>;
     if (!room) return <div>loading ba</div>;
-    console.log(room);
+
     return (
         <>
             <StyledBackLink href="/">back</StyledBackLink>
@@ -53,21 +72,38 @@ export default function RoomPage() {
                 <StyledInput name="image" type="File"></StyledInput>
                 <StyledUplaodButton type="submit">upload</StyledUplaodButton>
             </StyledImageForm>
-            <div>
+            <StyledImageContainer>
                 {pictures?.map((picture) => (
-                    <Image
-                        width={300}
-                        height={300}
-                        key={picture._id}
-                        src={picture.picture}
-                        alt={picture.name}
-                    />
+                    <>
+                        <StyledImageBox key={picture._id}>
+                            <StyledImage
+                                fill
+                                key={picture._id}
+                                src={picture.picture}
+                                alt="picture"
+                                style={{ objectFit: "contain" }}
+                            />
+                        </StyledImageBox>
+                    </>
                 ))}
-            </div>
-            <p> this is gonna be so cool {room.RoomColor}</p>
+            </StyledImageContainer>
         </>
     );
 }
+const StyledImageContainer = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px;
+`;
+const StyledImageBox = styled.div`
+    position: relative;
+    width: 350px;
+    height: 350px;
+    border-radius: 8px;
+    overflow: hidden;
+`;
+const StyledImage = styled(Image)``;
 
 const StyledInput = styled.input`
     margin: 20px;

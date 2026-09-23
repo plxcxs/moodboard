@@ -2,6 +2,8 @@ import { useRouter } from "next/router";
 import useSWR from "swr";
 import Link from "next/link";
 import styled from "styled-components";
+import Image from "next/image";
+
 const fetcher = (URL) => fetch(URL).then((response) => response.json());
 
 export default function RoomPage() {
@@ -14,6 +16,30 @@ export default function RoomPage() {
         isLoading,
     } = useSWR(id ? `/api/rooms/${id}` : null, fetcher);
 
+    const { data: pictures, mutate: mutatePictures } = useSWR(
+        id ? `/api/pictures?roomId=${id}` : null,
+        fetcher,
+    );
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+
+        const response = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+        });
+        const data = await response.json();
+        console.log(data);
+        await fetch("/api/pictures", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ picture: data.secure_url, roomId: id }),
+        });
+        mutatePictures();
+    }
+
     if (error) return <div>Error while Loading</div>;
     if (isLoading) return <div>Loading</div>;
     if (!room) return <div>loading ba</div>;
@@ -21,14 +47,45 @@ export default function RoomPage() {
     return (
         <>
             <StyledBackLink href="/">back</StyledBackLink>
-            <form>
-                <input type="File"></input>
-            </form>
+            <StyledImageForm $color={room.RoomColor} onSubmit={handleSubmit}>
+                <label htmlFor="image">image upload</label>
 
+                <StyledInput name="image" type="File"></StyledInput>
+                <StyledUplaodButton type="submit">upload</StyledUplaodButton>
+            </StyledImageForm>
+            <div>
+                {pictures?.map((picture) => (
+                    <Image
+                        width={300}
+                        height={300}
+                        key={picture._id}
+                        src={picture.picture}
+                        alt={picture.name}
+                    />
+                ))}
+            </div>
             <p> this is gonna be so cool {room.RoomColor}</p>
         </>
     );
 }
+
+const StyledInput = styled.input`
+    margin: 20px;
+`;
+
+const StyledUplaodButton = styled.button`
+    margin: 15px;
+`;
+
+const StyledImageForm = styled.form`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    background-color: ${(props) => props.$color};
+    margin: 15px;
+    font-size: 24px;
+`;
 
 const StyledBackLink = styled(Link)`
     border-radius: 10%;

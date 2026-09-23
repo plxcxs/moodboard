@@ -4,6 +4,11 @@ const { Schema } = mongoose;
 
 const pictureSchema = new Schema({
     picture: { type: String, required: true },
+    roomId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Room",
+        required: true,
+    },
 });
 const Picture =
     mongoose.models.Picture || mongoose.model("Picture", pictureSchema);

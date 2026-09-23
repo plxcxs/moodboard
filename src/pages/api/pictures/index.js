@@ -6,7 +6,8 @@ export default async function handler(request, response) {
 
     if (request.method === "GET") {
         try {
-            const pictures = await Picture.find();
+            const { roomId } = request.query;
+            const pictures = await Picture.find({ roomId });
             return response.status(200).json(pictures);
         } catch (error) {
             console.error(error);

@@ -41,6 +41,24 @@ export default function RoomPage() {
         clearTimeout(timeReference.current);
     }
 
+    async function handleDelete() {
+        try {
+            const dbPictureDelete = await fetch(
+                `/api/pictures/${selectedPicture._id}`,
+                {
+                    method: "DELETE",
+                },
+            );
+            if (!dbPictureDelete.ok) {
+                throw new Error("Deleting Failed");
+            }
+            mutatePictures();
+            setOpenModal(false);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     async function handleSubmit(event) {
         event.preventDefault();
 
@@ -61,7 +79,11 @@ export default function RoomPage() {
             const pictureResponse = await fetch("/api/pictures", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ picture: data.secure_url, roomId: id }),
+                body: JSON.stringify({
+                    picture: data.secure_url,
+                    roomId: id,
+                    publicId: data.public_id,
+                }),
             });
 
             if (!pictureResponse.ok) {
@@ -97,7 +119,10 @@ export default function RoomPage() {
                         <StyledModalBox>
                             <modal>
                                 <p>You want to delete this picture?</p>
-                                <button /* onClick={handleDelete(selectedPicture._id)} */
+                                <button
+                                    onClick={() =>
+                                        handleDelete(selectedPicture._id)
+                                    }
                                 >
                                     Delete
                                 </button>

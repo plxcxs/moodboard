@@ -1,5 +1,12 @@
 import dbConnect from "../../../../db/connect";
 import Picture from "../../../../db/models/picture";
+import cloudinary from "cloudinary";
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_SECRET,
+});
 
 export default async function handler(request, response) {
     await dbConnect();
@@ -29,6 +36,8 @@ export default async function handler(request, response) {
         }
     } else if (request.method === "DELETE") {
         try {
+            const pictureToDelete = await Picture.findById(id);
+            await cloudinary.v2.uploader.destroy(pictureToDelete.publicId);
             await Picture.findByIdAndDelete(id);
             return response
                 .status(200)

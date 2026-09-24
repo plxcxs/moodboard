@@ -44,7 +44,7 @@ export default async function handler(request, response) {
                 .json({ status: `Picture ${id} was deleted` });
         } catch (error) {
             console.error(error);
-            return response.status(405).json({ message: "couldnt Delete" });
+            return response.status(400).json({ message: "couldnt Delete" });
         }
     } else {
         return response.status(405).json({ message: "Method not Allowed" });

@@ -10,7 +10,7 @@ cloudinary.config({
 
 export default async function handler(request, response) {
     await dbConnect();
-    const { id } = request.query;
+    const { id } = request.params;
 
     if (request.method === "GET") {
         try {

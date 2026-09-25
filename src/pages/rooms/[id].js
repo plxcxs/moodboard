@@ -11,9 +11,10 @@ export default function RoomPage() {
     const router = useRouter();
     const { id } = router.query;
 
+    const [isUploading, setIsUploading] = useState(false);
     const [openModal, setOpenModal] = useState(false);
     const [selectedPicture, setSelectedPicture] = useState(null);
-    const timeReference = useRef(null);
+    /* const timeReference = useRef(null); */
 
     const {
         data: room,
@@ -28,28 +29,20 @@ export default function RoomPage() {
 
     const [message, setMessage] = useState();
 
-    function handleTouchStart(picture) {
-        timeReference.current = setTimeout(() => {
-            setSelectedPicture(picture);
-            setOpenModal(true);
-        }, 600);
-    }
-    function handleTouchEnd() {
-        clearTimeout(timeReference.current);
-    }
-    function handleTouchMove() {
-        clearTimeout(timeReference.current);
+    function handleModal(picture) {
+        setSelectedPicture(picture);
+        setOpenModal(true);
     }
 
     async function handleDelete() {
         try {
-            const dbPictureDelete = await fetch(
+            const response = await fetch(
                 `/api/pictures/${selectedPicture._id}`,
                 {
                     method: "DELETE",
                 },
             );
-            if (!dbPictureDelete.ok) {
+            if (!response.ok) {
                 throw new Error("Deleting Failed");
             }
             mutatePictures();
@@ -61,7 +54,7 @@ export default function RoomPage() {
 
     async function handleSubmit(event) {
         event.preventDefault();
-
+        setIsUploading(true);
         try {
             const formData = new FormData(event.target);
 
@@ -89,12 +82,14 @@ export default function RoomPage() {
             if (!pictureResponse.ok) {
                 throw new Error("picture could not be saved");
             }
-
+            event.target.reset();
             mutatePictures();
         } catch (error) {
             console.error(error);
             setMessage(error.mesage || "something went wrong");
             setTimeout(() => setMessage(null), 3000);
+        } finally {
+            setIsUploading(false);
         }
     }
 
@@ -108,8 +103,14 @@ export default function RoomPage() {
             <StyledImageForm $color={room.RoomColor} onSubmit={handleSubmit}>
                 <label htmlFor="image">image upload</label>
 
-                <StyledInput name="image" type="File"></StyledInput>
-                <StyledUplaodButton type="submit">upload</StyledUplaodButton>
+                <StyledInput
+                    name="image"
+                    accept="image/*"
+                    type="File"
+                ></StyledInput>
+                <StyledUplaodButton disabled={isUploading} type="submit">
+                    upload
+                </StyledUplaodButton>
             </StyledImageForm>
 
             <StyledImageContainer>
@@ -136,15 +137,16 @@ export default function RoomPage() {
                 {pictures?.map((picture) => (
                     <>
                         <StyledImageBox key={picture._id}>
+                            <StyledPushButton
+                                onClick={() => handleModal(picture)}
+                            >
+                                Delete
+                            </StyledPushButton>
                             <StyledImage
                                 fill
                                 key={picture._id}
                                 src={picture.picture}
                                 alt="picture"
-                                style={{ objectFit: "contain" }}
-                                onTouchStart={() => handleTouchStart(picture)}
-                                onTouchEnd={handleTouchEnd}
-                                onTouchMove={handleTouchMove}
                             />
                         </StyledImageBox>
                     </>
@@ -186,10 +188,16 @@ const StyledImageBox = styled.div`
     border-radius: 8px;
     overflow: hidden;
 `;
-const StyledImage = styled(Image)``;
+const StyledImage = styled(Image)`
+    object-fit: contain;
+`;
 
 const StyledInput = styled.input`
     margin: 20px;
+`;
+const StyledPushButton = styled.button`
+    position: absolute;
+    z-index: 1;
 `;
 
 const StyledUplaodButton = styled.button`

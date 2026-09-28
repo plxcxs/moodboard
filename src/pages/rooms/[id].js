@@ -14,7 +14,7 @@ export default function RoomPage() {
     const [isUploading, setIsUploading] = useState(false);
     const [openModal, setOpenModal] = useState(false);
     const [selectedPicture, setSelectedPicture] = useState(null);
-    /* const timeReference = useRef(null); */
+   
 
     const {
         data: room,

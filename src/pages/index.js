@@ -43,7 +43,7 @@ export default function Home() {
                             key={room._id}
                             href={`/rooms/${room._id}`}
                         >
-                            {room.RoomName}
+                           <StyledDiv>{room.RoomName}</StyledDiv>
 
                             <button
                                 onClick={(event) => {
@@ -62,7 +62,18 @@ export default function Home() {
     );
 }
 
+const StyledDiv = styled.div`
+
+border-radius:5px;
+margin: 3px;
+padding: 5px;
+color: #fafffa;
+/* min-width: content; */
+background-color: rgb(9, 9, 9);
+`
+
 const StyledLink = styled(Link)`
+border-radius: 5px;
     display: flex;
     padding: 10px;
     margin: 5px;

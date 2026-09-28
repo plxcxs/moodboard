@@ -43,11 +43,11 @@ export default function RoomForm() {
             {successMessage && <p>{successMessage}</p>}
             <StyledForm action="submit" onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="RoomName">Room Name</label>
+                    <label htmlFor="RoomName">Room Name: </label>
                     <input name="RoomName" type="text" />
                 </div>
                 <div>
-                    <label htmlFor="RoomColor">Room Color</label>
+                    <label htmlFor="RoomColor">Room Color: </label>
                     <input name="RoomColor" type="color" />
                 </div>
                 <button type="submit">create room</button>
@@ -57,8 +57,14 @@ export default function RoomForm() {
 }
 
 const StyledForm = styled.form`
+display:flex;
+flex-direction: column;
+align-items: center;
+justify-content: space-between;
+height: 100px;
     margin: 20px;
-    background-color: #97198b;
+    background-color: #3e3a37;
     padding: 5px;
     border-radius: 15px;
+    color: #fbfbfb;
 `;

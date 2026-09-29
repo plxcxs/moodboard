@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 import styled from "styled-components";
 import Image from "next/image";
+import { Heart } from "lucide-react";
+import ModalDelete from "../../../components/ModalDelete";
 
 const fetcher = (URL) => fetch(URL).then((response) => response.json());
 
@@ -14,7 +16,8 @@ export default function RoomPage() {
     const [isUploading, setIsUploading] = useState(false);
     const [openModal, setOpenModal] = useState(false);
     const [selectedPicture, setSelectedPicture] = useState(null);
-   
+    const [likedIds, setLikedIds] = useState([]);
+    const [message, setMessage] = useState();
 
     const {
         data: room,
@@ -27,7 +30,22 @@ export default function RoomPage() {
         fetcher,
     );
 
-    const [message, setMessage] = useState();
+    async function handleLike(picture) {
+        const isLiked = likedIds.includes(picture._id);
+
+        if (isLiked) {
+            await fetch(`/api/pictures/like?id=${picture._id}`, {
+                method: "DELETE",
+            });
+            setLikedIds(likedIds.filter((id) => id !== picture._id));
+        } else {
+            await fetch(`/api/pictures/like?id=${picture._id}`, {
+                method: "POST",
+            });
+            setLikedIds([...likedIds, picture._id]);
+        }
+        mutatePictures();
+    }
 
     function handleModal(picture) {
         setSelectedPicture(picture);
@@ -86,7 +104,7 @@ export default function RoomPage() {
             mutatePictures();
         } catch (error) {
             console.error(error);
-            setMessage(error.mesage || "something went wrong");
+            setMessage(error.message || "something went wrong");
             setTimeout(() => setMessage(null), 3000);
         } finally {
             setIsUploading(false);
@@ -114,34 +132,16 @@ export default function RoomPage() {
             </StyledImageForm>
 
             <StyledImageContainer>
-                {" "}
                 {openModal && selectedPicture && (
-                    <StyledModalContainer>
-                        <StyledModalBox>
-                            <modal>
-                                <p>You want to delete this picture?</p>
-                                <button
-                                    onClick={() =>
-                                        handleDelete(selectedPicture._id)
-                                    }
-                                >
-                                    Delete
-                                </button>
-                                <button onClick={() => setOpenModal(false)}>
-                                    Cancel
-                                </button>
-                            </modal>
-                        </StyledModalBox>
-                    </StyledModalContainer>
+                    <ModalDelete
+                        setOpenModal={setOpenModal}
+                        handleDelete={handleDelete}
+                        selectedPicture={selectedPicture}
+                    />
                 )}
                 {pictures?.map((picture) => (
-                    <>
+                    <StyledImageWrapper key={picture._id}>
                         <StyledImageBox key={picture._id}>
-                            <StyledPushButton
-                                onClick={() => handleModal(picture)}
-                            >
-                                Delete
-                            </StyledPushButton>
                             <StyledImage
                                 fill
                                 key={picture._id}
@@ -149,30 +149,43 @@ export default function RoomPage() {
                                 alt="picture"
                             />
                         </StyledImageBox>
-                    </>
+                        <StyledOptionBar>
+                            <StyledLikeButton
+                                onClick={() => handleLike(picture)}
+                            >
+                                <Heart
+                                    fill={
+                                        likedIds.includes(picture._id)
+                                            ? "red"
+                                            : "none"
+                                    }
+                                />
+                                <span> {picture.likes}</span>
+                            </StyledLikeButton>
+                            <StyledDeleteButton
+                                onClick={() => handleModal(picture)}
+                            >
+                                Delete
+                            </StyledDeleteButton>
+                        </StyledOptionBar>
+                    </StyledImageWrapper>
                 ))}
             </StyledImageContainer>
         </>
     );
 }
-
-const StyledModalContainer = styled.div`
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(59, 19, 19, 0.5);
+const StyledLikeButton = styled.button`
+    background-color: #000;
+    border: #000;
+`;
+const StyledOptionBar = styled.div`
     display: flex;
-    align-items: center;
-    justify-content: center;
+    justify-content: space-around;
 `;
 
-const StyledModalBox = styled.div`
-    background-color: rgba(23, 44, 57, 0.5);
-    padding: 20px;
-    border-radius: 10px;
+const StyledImageWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
 `;
 
 const StyledImageContainer = styled.div`
@@ -182,6 +195,7 @@ const StyledImageContainer = styled.div`
     margin: 15px;
 `;
 const StyledImageBox = styled.div`
+    margin: 20px;
     position: relative;
     width: 350px;
     height: 350px;
@@ -195,8 +209,8 @@ const StyledImage = styled(Image)`
 const StyledInput = styled.input`
     margin: 20px;
 `;
-const StyledPushButton = styled.button`
-    position: absolute;
+const StyledDeleteButton = styled.button`
+    /*  position: absolute; */
     z-index: 1;
 `;
 

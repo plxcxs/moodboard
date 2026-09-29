@@ -10,6 +10,7 @@ const pictureSchema = new Schema({
         ref: "Room",
         required: true,
     },
+    likes: { type: Number, required: true, default: 0 },
 });
 const Picture =
     mongoose.models.Picture || mongoose.model("Picture", pictureSchema);

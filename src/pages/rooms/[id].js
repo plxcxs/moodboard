@@ -150,7 +150,7 @@ export default function RoomPage() {
                     onChange={(event) =>
                         setHasImage(event.target.files.length > 0)
                     }
-                ></StyledInput>
+                />
                 <label htmlFor="text">text input</label>
                 <textarea
                     value={text}

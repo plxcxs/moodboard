@@ -37,7 +37,15 @@ export default async function handler(request, response) {
     } else if (request.method === "DELETE") {
         try {
             const pictureToDelete = await Picture.findById(id);
-            await cloudinary.v2.uploader.destroy(pictureToDelete.publicId);
+
+            if (!pictureToDelete) {
+                return response.status(400).json({ status: "Not found" });
+            }
+
+            if (pictureToDelete.publicId) {
+                await cloudinary.v2.uploader.destroy(pictureToDelete.publicId);
+            }
+
             await Picture.findByIdAndDelete(id);
             return response
                 .status(200)

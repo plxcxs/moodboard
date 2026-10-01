@@ -18,6 +18,9 @@ export default function RoomPage() {
     const [selectedPicture, setSelectedPicture] = useState(null);
     const [likedIds, setLikedIds] = useState([]);
     const [message, setMessage] = useState();
+    const [hasImage, setHasImage] = useState(false);
+    const [text, setText] = useState("");
+    const isEmpty = text.trim() === "" && !hasImage;
 
     const {
         data: room,
@@ -43,6 +46,7 @@ export default function RoomPage() {
                 method: "POST",
             });
             setLikedIds([...likedIds, picture._id]);
+            console.log(likedIds);
         }
         mutatePictures();
     }
@@ -74,33 +78,50 @@ export default function RoomPage() {
         event.preventDefault();
         setIsUploading(true);
         try {
-            const formData = new FormData(event.target);
+            const form = event.target;
+            const formData = new FormData(form);
+            const imageFile = formData.get("image");
+            const trimmedText = text.trim();
 
-            const response = await fetch("/api/upload", {
-                method: "POST",
-                body: formData,
-            });
+            let imageUrl;
+            let publicId;
 
-            if (!response.ok) {
-                throw new Error("Upload Failed");
+            if (imageFile && imageFile.size > 0) {
+                const response = await fetch("/api/upload", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error("Upload Failed");
+                }
+
+                const data = await response.json();
+                imageUrl = data.secure_url;
+                publicId = data.public_id;
             }
 
-            const data = await response.json();
+            if (!imageUrl && !trimmedText) {
+                throw new Error("please add a text or an image");
+            }
 
             const pictureResponse = await fetch("/api/pictures", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    picture: data.secure_url,
+                    picture: imageUrl,
                     roomId: id,
-                    publicId: data.public_id,
+                    publicId: publicId,
+                    text: trimmedText,
                 }),
             });
 
             if (!pictureResponse.ok) {
                 throw new Error("picture could not be saved");
             }
-            event.target.reset();
+            form.reset();
+            setText("");
+            setHasImage(false);
             mutatePictures();
         } catch (error) {
             console.error(error);
@@ -122,11 +143,26 @@ export default function RoomPage() {
                 <label htmlFor="image">image upload</label>
 
                 <StyledInput
+                    id="image"
                     name="image"
                     accept="image/*"
                     type="File"
-                ></StyledInput>
-                <StyledUplaodButton disabled={isUploading} type="submit">
+                    onChange={(event) =>
+                        setHasImage(event.target.files.length > 0)
+                    }
+                />
+                <label htmlFor="text">text input</label>
+                <textarea
+                    value={text}
+                    name="text"
+                    id="text"
+                    placeholder="Type here"
+                    onChange={(event) => setText(event.target.value)}
+                ></textarea>
+                <StyledUplaodButton
+                    disabled={isUploading || isEmpty}
+                    type="submit"
+                >
                     upload
                 </StyledUplaodButton>
             </StyledImageForm>
@@ -141,14 +177,21 @@ export default function RoomPage() {
                 )}
                 {pictures?.map((picture) => (
                     <StyledImageWrapper key={picture._id}>
-                        <StyledImageBox key={picture._id}>
-                            <StyledImage
-                                fill
-                                key={picture._id}
-                                src={picture.picture}
-                                alt="picture"
-                            />
-                        </StyledImageBox>
+                        {picture.picture && (
+                            <StyledImageBox key={picture._id}>
+                                <StyledImage
+                                    fill
+                                    key={picture._id}
+                                    src={picture.picture}
+                                    alt="picture"
+                                />
+                            </StyledImageBox>
+                        )}
+
+                        {picture.text && (
+                            <StyledText>{picture.text}</StyledText>
+                        )}
+
                         <StyledOptionBar>
                             <StyledLikeButton
                                 onClick={() => handleLike(picture)}
@@ -174,7 +217,14 @@ export default function RoomPage() {
         </>
     );
 }
+
+const StyledText = styled.div`
+    background-color: #9ff;
+    color: #000;
+`;
+
 const StyledLikeButton = styled.button`
+    color: #fff;
     background-color: #000;
     border: #000;
 `;

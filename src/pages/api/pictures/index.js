@@ -18,6 +18,15 @@ export default async function handler(request, response) {
     } else if (request.method === "POST") {
         try {
             const pictureData = request.body;
+            const hasText = Boolean(pictureData.text?.trim());
+            const hasPicture = Boolean(pictureData.picture);
+
+            if (!hasPicture && !hasText) {
+                return response
+                    .status(400)
+                    .json({ message: "text or picture required" });
+            }
+
             await Picture.create(pictureData);
             return response.status(201).json({ status: "Picture created" });
         } catch (error) {

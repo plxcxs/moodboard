@@ -18,7 +18,7 @@ export default async function handler(request, response) {
     } else if (request.method === "POST") {
         try {
             const pictureData = request.body;
-            const hasText = pictureData.text && pictureData.text.trim() !== "";
+            const hasText = Boolean(pictureData.text?.trim());
             const hasPicture = Boolean(pictureData.picture);
 
             if (!hasPicture && !hasText) {

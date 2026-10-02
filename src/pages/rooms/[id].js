@@ -6,6 +6,7 @@ import styled from "styled-components";
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import ModalDelete from "../../../components/ModalDelete";
+import PostModal from "../../../components/PostModal";
 
 const fetcher = (URL) => fetch(URL).then((response) => response.json());
 
@@ -21,6 +22,7 @@ export default function RoomPage() {
     const [hasImage, setHasImage] = useState(false);
     const [text, setText] = useState("");
     const isEmpty = text.trim() === "" && !hasImage;
+    const [selectedPost, setSelectedPost] = useState(null);
 
     const {
         data: room,
@@ -46,7 +48,6 @@ export default function RoomPage() {
                 method: "POST",
             });
             setLikedIds([...likedIds, picture._id]);
-            console.log(likedIds);
         }
         mutatePictures();
     }
@@ -141,7 +142,6 @@ export default function RoomPage() {
             <StyledBackLink href="/">back</StyledBackLink>
             <StyledImageForm $color={room.RoomColor} onSubmit={handleSubmit}>
                 <label htmlFor="image">image upload</label>
-
                 <StyledInput
                     id="image"
                     name="image"
@@ -169,11 +169,19 @@ export default function RoomPage() {
 
             <StyledImageContainer>
                 {openModal && selectedPicture && (
-                    <ModalDelete
-                        setOpenModal={setOpenModal}
-                        handleDelete={handleDelete}
-                        selectedPicture={selectedPicture}
-                    />
+                    <>
+                        <ModalDelete
+                            setOpenModal={setOpenModal}
+                            handleDelete={handleDelete}
+                            selectedPicture={selectedPicture}
+                        />
+                    </>
+                )}
+                {selectedPost && (
+                    <PostModal
+                        picture={selectedPost}
+                        onClose={() => setSelectedPost(null)}
+                    ></PostModal>
                 )}
                 {pictures?.map((picture) => (
                     <StyledImageWrapper key={picture._id}>
@@ -184,6 +192,7 @@ export default function RoomPage() {
                                     key={picture._id}
                                     src={picture.picture}
                                     alt="picture"
+                                    onClick={() => setSelectedPost(picture)}
                                 />
                             </StyledImageBox>
                         )}
@@ -261,7 +270,7 @@ const StyledInput = styled.input`
 `;
 const StyledDeleteButton = styled.button`
     /*  position: absolute; */
-    z-index: 1;
+    z-index: 0;
 `;
 
 const StyledUplaodButton = styled.button`
@@ -269,6 +278,8 @@ const StyledUplaodButton = styled.button`
 `;
 
 const StyledImageForm = styled.form`
+    border-radius: 5px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

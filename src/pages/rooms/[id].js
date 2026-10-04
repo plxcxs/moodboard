@@ -6,6 +6,7 @@ import styled from "styled-components";
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import ModalDelete from "../../../components/ModalDelete";
+import PostModal from "../../../components/PostModal";
 
 const fetcher = (URL) => fetch(URL).then((response) => response.json());
 
@@ -21,6 +22,7 @@ export default function RoomPage() {
     const [hasImage, setHasImage] = useState(false);
     const [text, setText] = useState("");
     const isEmpty = text.trim() === "" && !hasImage;
+    const [selectedPost, setSelectedPost] = useState(null);
 
     const {
         data: room,
@@ -46,7 +48,6 @@ export default function RoomPage() {
                 method: "POST",
             });
             setLikedIds([...likedIds, picture._id]);
-            console.log(likedIds);
         }
         mutatePictures();
     }
@@ -141,7 +142,6 @@ export default function RoomPage() {
             <StyledBackLink href="/">back</StyledBackLink>
             <StyledImageForm $color={room.RoomColor} onSubmit={handleSubmit}>
                 <label htmlFor="image">image upload</label>
-
                 <StyledInput
                     id="image"
                     name="image"
@@ -169,11 +169,19 @@ export default function RoomPage() {
 
             <StyledImageContainer>
                 {openModal && selectedPicture && (
-                    <ModalDelete
-                        setOpenModal={setOpenModal}
-                        handleDelete={handleDelete}
-                        selectedPicture={selectedPicture}
-                    />
+                    <>
+                        <ModalDelete
+                            setOpenModal={setOpenModal}
+                            handleDelete={handleDelete}
+                            selectedPicture={selectedPicture}
+                        />
+                    </>
+                )}
+                {selectedPost && (
+                    <PostModal
+                        picture={selectedPost}
+                        onClose={() => setSelectedPost(null)}
+                    ></PostModal>
                 )}
                 {pictures?.map((picture) => (
                     <StyledImageWrapper key={picture._id}>
@@ -184,6 +192,7 @@ export default function RoomPage() {
                                     key={picture._id}
                                     src={picture.picture}
                                     alt="picture"
+                                    onClick={() => setSelectedPost(picture)}
                                 />
                             </StyledImageBox>
                         )}
@@ -218,9 +227,18 @@ export default function RoomPage() {
     );
 }
 
-const StyledText = styled.div`
+const StyledText = styled.p`
     background-color: #9ff;
     color: #000;
+    @media (orientation: landscape) {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        overflow: hidden;
+    }
 `;
 
 const StyledLikeButton = styled.button`
@@ -236,6 +254,7 @@ const StyledOptionBar = styled.div`
 const StyledImageWrapper = styled.div`
     display: flex;
     flex-direction: column;
+    width: 350px;
 `;
 
 const StyledImageContainer = styled.div`
@@ -245,7 +264,7 @@ const StyledImageContainer = styled.div`
     margin: 15px;
 `;
 const StyledImageBox = styled.div`
-    margin: 20px;
+    /* margin: 10px; */
     position: relative;
     width: 350px;
     height: 350px;
@@ -261,7 +280,11 @@ const StyledInput = styled.input`
 `;
 const StyledDeleteButton = styled.button`
     /*  position: absolute; */
-    z-index: 1;
+    z-index: 0;
+    background-color: #959595;
+    border: solid #000;
+    border-radius: 5px;
+    padding: 5px;
 `;
 
 const StyledUplaodButton = styled.button`
@@ -269,6 +292,8 @@ const StyledUplaodButton = styled.button`
 `;
 
 const StyledImageForm = styled.form`
+    border-radius: 5px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

@@ -227,9 +227,18 @@ export default function RoomPage() {
     );
 }
 
-const StyledText = styled.div`
+const StyledText = styled.p`
     background-color: #9ff;
     color: #000;
+    @media (orientation: landscape) {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        overflow: hidden;
+    }
 `;
 
 const StyledLikeButton = styled.button`
@@ -245,6 +254,7 @@ const StyledOptionBar = styled.div`
 const StyledImageWrapper = styled.div`
     display: flex;
     flex-direction: column;
+    width: 350px;
 `;
 
 const StyledImageContainer = styled.div`
@@ -254,7 +264,7 @@ const StyledImageContainer = styled.div`
     margin: 15px;
 `;
 const StyledImageBox = styled.div`
-    margin: 20px;
+    /* margin: 10px; */
     position: relative;
     width: 350px;
     height: 350px;
@@ -271,6 +281,10 @@ const StyledInput = styled.input`
 const StyledDeleteButton = styled.button`
     /*  position: absolute; */
     z-index: 0;
+    background-color: #959595;
+    border: solid #000;
+    border-radius: 5px;
+    padding: 5px;
 `;
 
 const StyledUplaodButton = styled.button`

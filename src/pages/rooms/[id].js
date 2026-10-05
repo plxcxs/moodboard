@@ -77,28 +77,12 @@ export default function RoomPage() {
     return (
         <>
             <StyledBackLink href="/">back</StyledBackLink>
-
             <UploadForm
                 roomId={id}
                 color={room.RoomColor}
                 onUploaded={mutatePictures}
             />
             <StyledImageContainer>
-                {openModal && selectedPicture && (
-                    <>
-                        <ModalDelete
-                            setOpenModal={setOpenModal}
-                            handleDelete={handleDelete}
-                            selectedPicture={selectedPicture}
-                        />
-                    </>
-                )}
-                {selectedPost && (
-                    <PostModal
-                        picture={selectedPost}
-                        onClose={() => setSelectedPost(null)}
-                    ></PostModal>
-                )}
                 {pictures?.map((picture) => (
                     <PictureCard
                         key={picture._id}
@@ -110,6 +94,19 @@ export default function RoomPage() {
                     />
                 ))}
             </StyledImageContainer>
+            {openModal && selectedPicture && (
+                <ModalDelete
+                    setOpenModal={setOpenModal}
+                    handleDelete={handleDelete}
+                    selectedPicture={selectedPicture}
+                />
+            )}
+            {selectedPost && (
+                <PostModal
+                    picture={selectedPost}
+                    onClose={() => setSelectedPost(null)}
+                ></PostModal>
+            )}
         </>
     );
 }

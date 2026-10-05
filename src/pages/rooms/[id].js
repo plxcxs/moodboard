@@ -198,7 +198,11 @@ export default function RoomPage() {
                         )}
 
                         {picture.text && (
-                            <StyledText>{picture.text}</StyledText>
+                            <StyledText
+                                onClick={() => setSelectedPost(picture)}
+                            >
+                                {picture.text}
+                            </StyledText>
                         )}
 
                         <StyledOptionBar>

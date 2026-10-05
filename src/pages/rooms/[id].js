@@ -256,12 +256,15 @@ const StyledOptionBar = styled.div`
 `;
 
 const StyledImageWrapper = styled.div`
+    border: 1px solid white;
     display: flex;
     flex-direction: column;
     width: 350px;
 `;
 
 const StyledImageContainer = styled.div`
+    padding: 5px;
+
     display: flex;
     flex-wrap: wrap;
     gap: 10px;

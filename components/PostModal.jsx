@@ -100,9 +100,11 @@ const StyledImageBox = styled.div`
 `;
 
 const StyledText = styled.div`
+    padding: 10px;
+    border-radius: 5px;
     order: 2;
     flex-shrink: 0;
-
+    background-color: #389394e2;
     @media (orientation: landscape) {
         &[data-picture="portrait"] {
             order: 0;

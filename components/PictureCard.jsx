@@ -2,13 +2,13 @@ import styled from "styled-components";
 import Image from "next/image";
 import { Heart } from "lucide-react";
 
-export default function PictureCard(
+export default function PictureCard({
     picture,
     isLiked,
     onLike,
     onDelete,
     onOpen,
-) {
+}) {
     return (
         <StyledImageWrapper key={picture._id}>
             {picture.picture && (

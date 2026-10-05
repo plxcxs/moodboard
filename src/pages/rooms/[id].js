@@ -2,9 +2,7 @@ import { useRouter } from "next/router";
 import useSWR from "swr";
 import { useRef, useState } from "react";
 import Link from "next/link";
-import styled from "styled-components";
-import Image from "next/image";
-import { Heart } from "lucide-react";
+import PictureCard from "../../../components/PictureCard";
 import ModalDelete from "../../../components/ModalDelete";
 import PostModal from "../../../components/PostModal";
 
@@ -184,83 +182,19 @@ export default function RoomPage() {
                     ></PostModal>
                 )}
                 {pictures?.map((picture) => (
-                    <StyledImageWrapper key={picture._id}>
-                        {picture.picture && (
-                            <StyledImageBox key={picture._id}>
-                                <StyledImage
-                                    fill
-                                    key={picture._id}
-                                    src={picture.picture}
-                                    alt="picture"
-                                    onClick={() => setSelectedPost(picture)}
-                                />
-                            </StyledImageBox>
-                        )}
-
-                        {picture.text && (
-                            <StyledText
-                                onClick={() => setSelectedPost(picture)}
-                            >
-                                {picture.text}
-                            </StyledText>
-                        )}
-
-                        <StyledOptionBar>
-                            <StyledLikeButton
-                                onClick={() => handleLike(picture)}
-                            >
-                                <Heart
-                                    fill={
-                                        likedIds.includes(picture._id)
-                                            ? "red"
-                                            : "none"
-                                    }
-                                />
-                                <span> {picture.likes}</span>
-                            </StyledLikeButton>
-                            <StyledDeleteButton
-                                onClick={() => handleModal(picture)}
-                            >
-                                Delete
-                            </StyledDeleteButton>
-                        </StyledOptionBar>
-                    </StyledImageWrapper>
+                    <PictureCard
+                        key={picture._id}
+                        picture={picture}
+                        isLiked={likedIds.includes(picture._id)}
+                        onLike={() => handleLike(picture)}
+                        onDelete={() => handleModal(picture)}
+                        onOpen={() => setSelectedPost(picture)}
+                    />
                 ))}
             </StyledImageContainer>
         </>
     );
 }
-
-const StyledText = styled.p`
-    background-color: #9ff;
-    color: #000;
-    @media (orientation: landscape) {
-        max-width: 100%;
-        overflow-wrap: anywhere;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 3;
-        line-clamp: 3;
-        overflow: hidden;
-    }
-`;
-
-const StyledLikeButton = styled.button`
-    color: #fff;
-    background-color: #000;
-    border: #000;
-`;
-const StyledOptionBar = styled.div`
-    display: flex;
-    justify-content: space-around;
-`;
-
-const StyledImageWrapper = styled.div`
-    border: 1px solid white;
-    display: flex;
-    flex-direction: column;
-    width: 350px;
-`;
 
 const StyledImageContainer = styled.div`
     padding: 5px;
@@ -270,28 +204,9 @@ const StyledImageContainer = styled.div`
     gap: 10px;
     margin: 15px;
 `;
-const StyledImageBox = styled.div`
-    /* margin: 10px; */
-    position: relative;
-    width: 350px;
-    height: 350px;
-    border-radius: 8px;
-    overflow: hidden;
-`;
-const StyledImage = styled(Image)`
-    object-fit: contain;
-`;
 
 const StyledInput = styled.input`
     margin: 20px;
-`;
-const StyledDeleteButton = styled.button`
-    /*  position: absolute; */
-    z-index: 0;
-    background-color: #959595;
-    border: solid #000;
-    border-radius: 5px;
-    padding: 5px;
 `;
 
 const StyledUplaodButton = styled.button`

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useSWR from "swr";
+import styled from "styled-components";
 
 const fetcher = (URL) => fetch(URL).then((response) => response.json());
 
@@ -12,8 +13,22 @@ export default function CommentSection({ pictureId }) {
         fetcher,
     );
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
+        try {
+            const response = await fetch("/api/comments", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: comment, pictureId }),
+            });
+            if (!response.ok) {
+                throw new Error("Comment could not be saved");
+            }
+            setComment("");
+            mutateComments();
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     return (
@@ -21,18 +36,32 @@ export default function CommentSection({ pictureId }) {
             <form onSubmit={handleSubmit}>
                 <label htmlFor="comment">comment</label>
                 <br />
-                <input
+                <StyledTextArea
                     id="comment"
                     name="comment"
-                    type="text"
                     value={comment}
                     onChange={(event) => setComment(event.target.value)}
                 />
                 <button disabled={isEmpty}>send</button>
             </form>
             {comments?.map((singleComment) => (
-                <div key={singleComment._id}>{singleComment.text}</div>
+                <StyledComment key={singleComment._id}>
+                    {singleComment.text}
+                </StyledComment>
             ))}
         </>
     );
 }
+
+const StyledTextArea = styled.textarea`
+    resize: none;
+`;
+
+const StyledComment = styled.div`
+    padding: 3vw;
+    background-color: #9fa3b4c5;
+    border: 1px solid red;
+    color: #000;
+    font-size: larger;
+    font-weight: bold;
+`;

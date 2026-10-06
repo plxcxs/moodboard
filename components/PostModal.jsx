@@ -109,21 +109,10 @@ const StyledImageBox = styled.div`
         flex: none;
         aspect-ratio: ${(props) => props.$ratio};
         max-height: 65vh;
-        /*   &[data-picture="landscape"] {
-            flex: 1;
-            height: auto;
-            min-height: 0;
-        } */
     }
 `;
 
 const StyledText = styled.div`
-    /*  position: relative;
-    width: 100%;
-    height: 100%;
-    flex-shrink: 0;
-    order: 1; */
-
     padding: 10px;
     border-radius: 5px;
     order: 2;
@@ -137,11 +126,6 @@ const StyledText = styled.div`
         }
     }
     @media (orientation: portrait) {
-        /* height: auto;
-        flex: none;
-        aspect-ratio: ${(props) => props.$ratio};
-        max-height: 65vh; */
-
         &[data-picture="landscape"] {
             order: 0;
             max-height: 30%;

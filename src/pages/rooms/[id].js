@@ -7,6 +7,7 @@ import ModalDelete from "../../../components/ModalDelete";
 import PostModal from "../../../components/PostModal";
 import UploadForm from "../../../components/UploadForm";
 import styled from "styled-components";
+import CommentSection from "../../../components/CommentSection";
 
 const fetcher = (URL) => fetch(URL).then((response) => response.json());
 
@@ -105,7 +106,7 @@ export default function RoomPage() {
                 <PostModal
                     picture={selectedPost}
                     onClose={() => setSelectedPost(null)}
-                ></PostModal>
+                />
             )}
         </>
     );

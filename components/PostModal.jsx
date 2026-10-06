@@ -1,10 +1,11 @@
 import Image from "next/image";
 import styled from "styled-components";
 import { useState } from "react";
+import CommentSection from "./CommentSection";
 
 export default function PostModal({ picture, onClose }) {
     const [pictureShape, setPictureShape] = useState("landscape");
-
+    const [pictureRatio, setPictureRatio] = useState(1);
     return (
         <StyledOverlay onClick={onClose}>
             <StyledCloseButton onClick={onClose}>close</StyledCloseButton>
@@ -13,7 +14,10 @@ export default function PostModal({ picture, onClose }) {
                 onClick={(event) => event.stopPropagation()}
             >
                 {picture.picture && (
-                    <StyledImageBox data-picture={pictureShape}>
+                    <StyledImageBox
+                        data-picture={pictureShape}
+                        $ratio={pictureRatio}
+                    >
                         <Image
                             fill
                             style={{ objectFit: "contain" }}
@@ -27,6 +31,7 @@ export default function PostModal({ picture, onClose }) {
                                         ? "landscape"
                                         : "portrait",
                                 );
+                                setPictureRatio(naturalWidth / naturalHeight);
                             }}
                         />
                     </StyledImageBox>
@@ -36,10 +41,19 @@ export default function PostModal({ picture, onClose }) {
                         {picture.text}
                     </StyledText>
                 )}
+                <StyledCommentBox>
+                    <CommentSection pictureId={picture._id} />
+                </StyledCommentBox>
             </StyledModalBox>
         </StyledOverlay>
     );
 }
+
+const StyledCommentBox = styled.div`
+    order: 3;
+    flex-shrink: 0;
+`;
+
 const StyledCloseButton = styled.button`
     position: absolute;
     top: 1rem;
@@ -91,15 +105,25 @@ const StyledImageBox = styled.div`
         }
     }
     @media (orientation: portrait) {
-        &[data-picture="landscape"] {
+        height: auto;
+        flex: none;
+        aspect-ratio: ${(props) => props.$ratio};
+        max-height: 65vh;
+        /*   &[data-picture="landscape"] {
             flex: 1;
             height: auto;
             min-height: 0;
-        }
+        } */
     }
 `;
 
 const StyledText = styled.div`
+    /*  position: relative;
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+    order: 1; */
+
     padding: 10px;
     border-radius: 5px;
     order: 2;
@@ -113,6 +137,11 @@ const StyledText = styled.div`
         }
     }
     @media (orientation: portrait) {
+        /* height: auto;
+        flex: none;
+        aspect-ratio: ${(props) => props.$ratio};
+        max-height: 65vh; */
+
         &[data-picture="landscape"] {
             order: 0;
             max-height: 30%;

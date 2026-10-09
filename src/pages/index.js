@@ -31,6 +31,7 @@ export default function Home() {
             <Head>
                 <title>Moodboard</title>
             </Head>
+            <StyledWelcome>Welcome to Your Moodboard</StyledWelcome>
             {session && (
                 <>
                     <RoomForm />
@@ -62,6 +63,14 @@ export default function Home() {
         </>
     );
 }
+
+const StyledWelcome = styled.div`
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
 
 const StyledDiv = styled.div`
     border-radius: 5px;

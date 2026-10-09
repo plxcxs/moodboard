@@ -1,18 +1,15 @@
 import Head from "next/head";
-import Image from "next/image";
 import styled from "styled-components";
-import List from "../../components/List";
 import Link from "next/link";
 import useSWR, { mutate } from "swr";
 import RoomForm from "../../components/RoomForm";
-import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 const fetcher = (url) => fetch(url).then((response) => response.json());
 
 export default function Home() {
     const { data: rooms, error, isLoading } = useSWR("/api/rooms", fetcher);
-    const router = useRouter();
-    /* const { id } = router.query; */
+    const { data: session } = useSession();
 
     if (error) return <div>error buhhuu</div>;
     if (isLoading) return <div>is loading beeeheee</div>;
@@ -34,51 +31,70 @@ export default function Home() {
             <Head>
                 <title>Moodboard</title>
             </Head>
-            <RoomForm />
-            <StyledSection>
-                {rooms.map((room) => {
-                    return (
-                        <StyledLink
-                            $color={room.RoomColor}
-                            key={room._id}
-                            href={`/rooms/${room._id}`}
-                        >
-                           <StyledDiv>{room.RoomName}</StyledDiv>
+            <StyledWelcome>Welcome to Your Moodboard</StyledWelcome>
+            {session && (
+                <>
+                    <RoomForm />
+                    <StyledSection>
+                        {rooms.map((room) => {
+                            return (
+                                <StyledLink
+                                    $color={room.RoomColor}
+                                    key={room._id}
+                                    href={`/rooms/${room._id}`}
+                                >
+                                    <StyledDiv>{room.RoomName}</StyledDiv>
 
-                            <button
-                                onClick={(event) => {
-                                    event.preventDefault();
-                                    event.stopPropagation();
-                                    handleDeleteRoom(room._id);
-                                }}
-                            >
-                                Delete Room
-                            </button>
-                        </StyledLink>
-                    );
-                })}
-            </StyledSection>
+                                    <button
+                                        onClick={(event) => {
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                            handleDeleteRoom(room._id);
+                                        }}
+                                    >
+                                        Delete Room
+                                    </button>
+                                </StyledLink>
+                            );
+                        })}
+                    </StyledSection>
+                </>
+            )}
         </>
     );
 }
 
-const StyledDiv = styled.div`
+const StyledWelcome = styled.div`
+    background-color: #000000;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    font-size: 40px;
+    border-radius: 10px;
+    border: 5px solid #07cd00;
+`;
 
-border-radius:5px;
-margin: 3px;
-padding: 5px;
-color: #fafffa;
-/* min-width: content; */
-background-color: rgb(9, 9, 9);
-`
+const StyledDiv = styled.div`
+    border-radius: 5px;
+    margin: 3px;
+    padding: 5px;
+    color: #fafffa;
+    /* min-width: content; */
+    background-color: rgb(9, 9, 9);
+`;
 
 const StyledLink = styled(Link)`
-border-radius: 5px;
+    border-radius: 5px;
     display: flex;
     padding: 10px;
     margin: 5px;
-    background-color: ${(props) => props.$color};
+    background-color: black;
+    border: 5px solid ${(props) => props.$color};
     justify-content: space-between;
+    border-radius: 5px;
 `;
 
 const StyledSection = styled.section`

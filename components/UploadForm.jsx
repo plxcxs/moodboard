@@ -77,19 +77,22 @@ export default function UploadForm({ roomId, color, onUploaded }) {
                 onChange={(event) => setHasImage(event.target.files.length > 0)}
             />
             <label htmlFor="text">text input</label>
-            <textarea
+            <StyledTextArea
                 value={text}
                 name="text"
                 id="text"
                 placeholder="Type here"
                 onChange={(event) => setText(event.target.value)}
-            ></textarea>
+            ></StyledTextArea>
             <StyledUplaodButton disabled={isUploading || isEmpty} type="submit">
                 upload
             </StyledUplaodButton>
         </StyledImageForm>
     );
 }
+const StyledTextArea = styled.textarea`
+    resize: none;
+`;
 const StyledInput = styled.input`
     margin: 20px;
 `;

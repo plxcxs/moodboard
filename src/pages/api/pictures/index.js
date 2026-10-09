@@ -10,7 +10,9 @@ export default async function handler(request, response) {
             const token = await getToken({ req: request });
             const userId = token?.sub;
             const { roomId } = request.query;
-            const pictures = await Picture.find({ roomId }).lean();
+            const pictures = await Picture.find({ roomId })
+                .sort({ _id: -1 })
+                .lean();
             const result = pictures.map(({ likedBy = [], ...picture }) => ({
                 ...picture,
                 isLiked: likedBy.includes(userId),

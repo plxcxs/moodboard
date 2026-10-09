@@ -1,14 +1,21 @@
 import dbConnect from "../../../../db/connect";
 import Picture from "../../../../db/models/picture";
+import { getToken } from "next-auth/jwt";
 
 export default async function handler(request, response) {
     await dbConnect();
 
     if (request.method === "GET") {
         try {
+            const token = await getToken({ req: request });
+            const userId = token?.sub;
             const { roomId } = request.query;
-            const pictures = await Picture.find({ roomId });
-            return response.status(200).json(pictures);
+            const pictures = await Picture.find({ roomId }).lean();
+            const result = pictures.map(({ likedBy = [], ...picture }) => ({
+                ...picture,
+                isLiked: likedBy.includes(userId),
+            }));
+            return response.status(200).json(result);
         } catch (error) {
             console.error(error);
             return response

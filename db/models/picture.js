@@ -11,6 +11,7 @@ const pictureSchema = new Schema({
         required: true,
     },
     likes: { type: Number, required: true, default: 0 },
+    likedBy: { type: [String], default: [] },
     text: { type: String },
 });
 const Picture =

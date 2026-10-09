@@ -17,7 +17,6 @@ export default function RoomPage() {
     const { data: session } = useSession();
     const [openModal, setOpenModal] = useState(false);
     const [selectedPicture, setSelectedPicture] = useState(null);
-    const [likedIds, setLikedIds] = useState([]);
     const [selectedPost, setSelectedPost] = useState(null);
 
     const {
@@ -32,19 +31,9 @@ export default function RoomPage() {
     );
 
     async function handleLike(picture) {
-        const isLiked = likedIds.includes(picture._id);
-
-        if (isLiked) {
-            await fetch(`/api/pictures/like?id=${picture._id}`, {
-                method: "DELETE",
-            });
-            setLikedIds(likedIds.filter((id) => id !== picture._id));
-        } else {
-            await fetch(`/api/pictures/like?id=${picture._id}`, {
-                method: "POST",
-            });
-            setLikedIds([...likedIds, picture._id]);
-        }
+        await fetch(`/api/pictures/like?id=${picture._id}`, {
+            method: picture.isLiked ? "DELETE" : "POST",
+        });
         mutatePictures();
     }
 
@@ -90,7 +79,7 @@ export default function RoomPage() {
                             <PictureCard
                                 key={picture._id}
                                 picture={picture}
-                                isLiked={likedIds.includes(picture._id)}
+                                isLiked={picture.isLiked}
                                 onLike={() => handleLike(picture)}
                                 onDelete={() => handleModal(picture)}
                                 onOpen={() => setSelectedPost(picture)}

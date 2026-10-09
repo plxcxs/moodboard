@@ -65,11 +65,16 @@ export default function Home() {
 }
 
 const StyledWelcome = styled.div`
-    background-color: #000;
+    background-color: #000000;
     color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    font-size: 40px;
+    border-radius: 10px;
+    border: 5px solid #07cd00;
 `;
 
 const StyledDiv = styled.div`
@@ -86,8 +91,10 @@ const StyledLink = styled(Link)`
     display: flex;
     padding: 10px;
     margin: 5px;
-    background-color: ${(props) => props.$color};
+    background-color: black;
+    border: 5px solid ${(props) => props.$color};
     justify-content: space-between;
+    border-radius: 5px;
 `;
 
 const StyledSection = styled.section`

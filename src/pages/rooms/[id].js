@@ -7,14 +7,14 @@ import ModalDelete from "../../../components/ModalDelete";
 import PostModal from "../../../components/PostModal";
 import UploadForm from "../../../components/UploadForm";
 import styled from "styled-components";
-import CommentSection from "../../../components/CommentSection";
+import { useSession } from "next-auth/react";
 
 const fetcher = (URL) => fetch(URL).then((response) => response.json());
 
 export default function RoomPage() {
     const router = useRouter();
     const { id } = router.query;
-
+    const { data: session } = useSession();
     const [openModal, setOpenModal] = useState(false);
     const [selectedPicture, setSelectedPicture] = useState(null);
     const [likedIds, setLikedIds] = useState([]);
@@ -77,36 +77,40 @@ export default function RoomPage() {
 
     return (
         <>
-            <StyledBackLink href="/">back</StyledBackLink>
-            <UploadForm
-                roomId={id}
-                color={room.RoomColor}
-                onUploaded={mutatePictures}
-            />
-            <StyledImageContainer>
-                {pictures?.map((picture) => (
-                    <PictureCard
-                        key={picture._id}
-                        picture={picture}
-                        isLiked={likedIds.includes(picture._id)}
-                        onLike={() => handleLike(picture)}
-                        onDelete={() => handleModal(picture)}
-                        onOpen={() => setSelectedPost(picture)}
+            {session && (
+                <>
+                    <StyledBackLink href="/">back</StyledBackLink>
+                    <UploadForm
+                        roomId={id}
+                        color={room.RoomColor}
+                        onUploaded={mutatePictures}
                     />
-                ))}
-            </StyledImageContainer>
-            {openModal && selectedPicture && (
-                <ModalDelete
-                    setOpenModal={setOpenModal}
-                    handleDelete={handleDelete}
-                    selectedPicture={selectedPicture}
-                />
-            )}
-            {selectedPost && (
-                <PostModal
-                    picture={selectedPost}
-                    onClose={() => setSelectedPost(null)}
-                />
+                    <StyledImageContainer>
+                        {pictures?.map((picture) => (
+                            <PictureCard
+                                key={picture._id}
+                                picture={picture}
+                                isLiked={likedIds.includes(picture._id)}
+                                onLike={() => handleLike(picture)}
+                                onDelete={() => handleModal(picture)}
+                                onOpen={() => setSelectedPost(picture)}
+                            />
+                        ))}
+                    </StyledImageContainer>
+                    {openModal && selectedPicture && (
+                        <ModalDelete
+                            setOpenModal={setOpenModal}
+                            handleDelete={handleDelete}
+                            selectedPicture={selectedPicture}
+                        />
+                    )}
+                    {selectedPost && (
+                        <PostModal
+                            picture={selectedPost}
+                            onClose={() => setSelectedPost(null)}
+                        />
+                    )}
+                </>
             )}
         </>
     );

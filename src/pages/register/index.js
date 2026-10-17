@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import styled from "styled-components";
 
 export default function RegisterPage() {
     const [errorMessage, setErrorMessage] = useState("");
@@ -23,28 +25,39 @@ export default function RegisterPage() {
         await signIn("credentials", { email, password, callbackUrl: "/" });
     }
     return (
-        <form onSubmit={handleSubmit}>
-            <h1>Register</h1>
-            {errorMessage && <p>{errorMessage}</p>}
+        <>
+            <StyledBackLink href="/">back</StyledBackLink>
+            <form onSubmit={handleSubmit}>
+                <h1>Register</h1>
+                {errorMessage && <p>{errorMessage}</p>}
 
-            <label htmlFor="email">Email</label>
-            <input id="email" name="email" type="email" required />
-            <label htmlFor="password">Password</label>
-            <input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                minLength={8}
-                required
-            />
-            <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide Password" : "Show Pasword"}
-            >
-                {showPassword ? <EyeOff /> : <Eye />}
-            </button>
-            <button type="submit">Register</button>
-        </form>
+                <label htmlFor="email">Email</label>
+                <input id="email" name="email" type="email" required />
+                <label htmlFor="password">Password</label>
+                <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    minLength={8}
+                    required
+                />
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide Password" : "Show Pasword"}
+                >
+                    {showPassword ? <EyeOff /> : <Eye />}
+                </button>
+                <button type="submit">Register</button>
+            </form>
+        </>
     );
 }
+
+const StyledBackLink = styled(Link)`
+    border-radius: 10%;
+    margin: 10px;
+    display: inline-block;
+    padding: 10px;
+    background-color: crimson;
+`;

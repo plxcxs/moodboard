@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function UploadForm({ roomId, color, onUploaded }) {
     const [isUploading, setIsUploading] = useState(false);
@@ -7,6 +7,19 @@ export default function UploadForm({ roomId, color, onUploaded }) {
     const [text, setText] = useState("");
     const [message, setMessage] = useState();
     const isEmpty = text.trim() === "" && !hasImage;
+    const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        function handlePaste(event) {
+            const files = event.clipboardData?.files;
+            if (!files?.length || !files[0].type.startsWith("image/")) return;
+
+            fileInputRef.current.files = files;
+            setHasImage(true);
+        }
+        window.addEventListener("paste", handlePaste);
+        return () => window.removeEventListener("paste", handlePaste);
+    }, []);
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -70,6 +83,7 @@ export default function UploadForm({ roomId, color, onUploaded }) {
         <StyledImageForm $color={color} onSubmit={handleSubmit}>
             <label htmlFor="image">image upload</label>
             <StyledInput
+                ref={fileInputRef}
                 id="image"
                 name="image"
                 accept="image/*"
